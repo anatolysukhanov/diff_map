@@ -364,6 +364,18 @@ function initMap() {
     apiKey: "efae24f5d54f80890dff448d2cff5b958f658e39"
   });
 
+  function setTooltip({ x, y, object }) {
+    const tooltip = document.getElementById("tooltip");
+    if (object) {
+      tooltip.style.display = "block";
+      tooltip.style.left = x + "px";
+      tooltip.style.top = y + "px";
+      tooltip.innerHTML = object.properties.fsr ? object.properties.fsr : object.properties.delta;
+    } else {
+      tooltip.style.display = "none";
+    }
+  }
+
   const deckOverlay = new deck.GoogleMapsOverlay();
 
   const parcelsLayer = new deck.carto.CartoSQLLayer({
@@ -374,9 +386,7 @@ function initMap() {
     lineWidthUnits: "pixels",
     getLineWidth: 1,
     lineWidthMinPixels: 1,
-    pickable: true,
-    onClick: info =>
-      info.object && console.log(`${info.object.properties.dblink}`)
+    pickable: true
   });
 
   const buildingsLayer = new deck.carto.CartoSQLLayer({
@@ -386,10 +396,7 @@ function initMap() {
     getFillColor: [150, 75, 0],
     lineWidthUnits: "pixels",
     getLineWidth: 1,
-    lineWidthMinPixels: 1,
-    pickable: true,
-    onClick: info =>
-      info.object && console.log(`${info.object.properties.bldgtype}`)
+    lineWidthMinPixels: 1
   });
 
   const zonesLayer = new deck.carto.CartoSQLLayer({
@@ -412,7 +419,8 @@ function initMap() {
     getLineWidth: 1,
     lineWidthMinPixels: 1,
     pickable: true,
-    onClick: info => info.object && console.log(`${info.object.properties.fsr}`)
+    autoHighlight: true,
+    onHover: setTooltip
   });
 
   const ocpLayer = new deck.carto.CartoSQLLayer({
@@ -445,7 +453,8 @@ function initMap() {
     getLineWidth: 1,
     lineWidthMinPixels: 1,
     pickable: true,
-    onClick: info => info.object && console.log(`${info.object.properties.fsr}`)
+    autoHighlight: true,
+    onHover: setTooltip
   });
 
   const deltaLayer = new deck.carto.CartoSQLLayer({
@@ -471,8 +480,8 @@ function initMap() {
     getLineWidth: 1,
     lineWidthMinPixels: 1,
     pickable: true,
-    onClick: info =>
-      info.object && console.log(`${info.object.properties.delta}`)
+    autoHighlight: true,
+    onHover: setTooltip
   });
 
   deckOverlay.setProps({
