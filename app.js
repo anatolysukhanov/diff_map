@@ -367,10 +367,18 @@ function initMap() {
   function setTooltip({ x, y, object }) {
     const tooltip = document.getElementById("tooltip");
     if (object) {
+      const field =
+        object.properties.bldgtype !== undefined
+          ? object.properties.address !== undefined
+            ? object.properties.address + ` (${object.properties.bldgtype})`
+            : object.properties.bldgtype
+          : object.properties.fsr !== undefined
+          ? object.properties.fsr
+          : object.properties.delta;
       tooltip.style.display = "block";
       tooltip.style.left = x + "px";
       tooltip.style.top = y + "px";
-      tooltip.innerHTML = object.properties.fsr ? object.properties.fsr : object.properties.delta;
+      tooltip.innerHTML = field;
     } else {
       tooltip.style.display = "none";
     }
@@ -396,7 +404,10 @@ function initMap() {
     getFillColor: [150, 75, 0],
     lineWidthUnits: "pixels",
     getLineWidth: 1,
-    lineWidthMinPixels: 1
+    lineWidthMinPixels: 1,
+    pickable: true,
+    autoHighlight: true,
+    onHover: setTooltip
   });
 
   const zonesLayer = new deck.carto.CartoSQLLayer({

@@ -185,4 +185,5 @@ body {
     padding: 4px;
     padding: 8px;
     pointer-events: none;
+    display: none;
 }
