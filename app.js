@@ -364,21 +364,26 @@ function initMap() {
     apiKey: "efae24f5d54f80890dff448d2cff5b958f658e39"
   });
 
-  function setTooltip({ x, y, object }) {
+  function setTooltip(layer, { x, y, object }) {
     const tooltip = document.getElementById("tooltip");
     if (object) {
-      const field =
-        object.properties.bldgtype !== undefined
-          ? object.properties.address !== undefined
+      let content = "";
+      if (layer === "parcels") {
+        content = object.properties.area.toFixed(0) + " ft&#178;"; // convert square meters to square feet
+      } else if (layer === "buildings") {
+        content =
+          object.properties.address !== undefined
             ? object.properties.address + ` (${object.properties.bldgtype})`
-            : object.properties.bldgtype
-          : object.properties.fsr !== undefined
-          ? object.properties.fsr
-          : object.properties.delta;
+            : object.properties.bldgtype;
+      } else if (layer === "zones" || layer === "ocp") {
+        content = object.properties.fsr;
+      } else {
+        content = object.properties.delta;
+      }
       tooltip.style.display = "block";
       tooltip.style.left = x + "px";
       tooltip.style.top = y + "px";
-      tooltip.innerHTML = field;
+      tooltip.innerHTML = content;
     } else {
       tooltip.style.display = "none";
     }
@@ -394,7 +399,9 @@ function initMap() {
     lineWidthUnits: "pixels",
     getLineWidth: 1,
     lineWidthMinPixels: 1,
-    pickable: true
+    pickable: true,
+    autoHighlight: true,
+    onHover: e => setTooltip("parcels", e)
   });
 
   const buildingsLayer = new deck.carto.CartoSQLLayer({
@@ -407,7 +414,7 @@ function initMap() {
     lineWidthMinPixels: 1,
     pickable: true,
     autoHighlight: true,
-    onHover: setTooltip
+    onHover: e => setTooltip("buildings", e)
   });
 
   const zonesLayer = new deck.carto.CartoSQLLayer({
@@ -431,7 +438,7 @@ function initMap() {
     lineWidthMinPixels: 1,
     pickable: true,
     autoHighlight: true,
-    onHover: setTooltip
+    onHover: e => setTooltip("zones", e)
   });
 
   const ocpLayer = new deck.carto.CartoSQLLayer({
@@ -465,7 +472,7 @@ function initMap() {
     lineWidthMinPixels: 1,
     pickable: true,
     autoHighlight: true,
-    onHover: setTooltip
+    onHover: e => setTooltip("ocp", e)
   });
 
   const deltaLayer = new deck.carto.CartoSQLLayer({
@@ -492,7 +499,7 @@ function initMap() {
     lineWidthMinPixels: 1,
     pickable: true,
     autoHighlight: true,
-    onHover: setTooltip
+    onHover: e => setTooltip("delta", e)
   });
 
   deckOverlay.setProps({
