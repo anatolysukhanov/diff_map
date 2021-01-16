@@ -12,7 +12,7 @@ setDefaultCredentials({
   apiKey: "efae24f5d54f80890dff448d2cff5b958f658e39"
 });
 
-const GOOGLE_MAPS_TOKEN = "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw";
+const GOOGLE_MAPS_TOKEN = "<enter your api key>";
 
 const HOST = "https://maps.googleapis.com/maps/api/js";
 const LOADING_GIF =
@@ -76,7 +76,7 @@ class DeckOverlayWrapper extends Component {
         new CartoSQLLayer({
           id: "parcels",
           //data: "parcels",
-          data: "select * from parcels where area > 500000",
+          data: "select * from parcels",
           opacity: 1,
           getFillColor: [0, 255, 255],
           lineWidthUnits: "pixels",
@@ -185,21 +185,20 @@ class DeckOverlayWrapper extends Component {
       }
     });
 
-    // this.deckOverlay.setProps({ layers });
-
     // eslint-disable-next-line react/no-did-mount-set-state
     // this.setState({ isOverlayConfigured: true });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log("new search?", prevProps.search !== this.props.search);
-    if (prevProps.search !== this.props.search)
+    if (prevProps.search !== this.props.search) {
+      console.log("new search");
       this.deckOverlay.setProps({
         layers: [
           new CartoSQLLayer({
             id: "parcels",
-            //data: "parcels",
-            data: `select * from parcels where area >= ${this.props.search}`,
+            data: this.props.search
+              ? `SELECT * FROM parcels WHERE area >= ${this.props.search}`
+              : "SELECT * FROM parcels",
             opacity: 1,
             getFillColor: [0, 255, 255],
             lineWidthUnits: "pixels",
@@ -212,6 +211,7 @@ class DeckOverlayWrapper extends Component {
           })
         ]
       });
+    }
   }
 
   componentWillUnmount() {
