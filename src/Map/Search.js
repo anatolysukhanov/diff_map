@@ -1,31 +1,25 @@
 import React, { Component } from "react";
 import { Input, Label, Form, Button, Icon, Select } from "semantic-ui-react";
 
-import {
-  changeParcelSize,
-  changeSiteCoverage,
-  findParcels,
-  toggleSearchPanel
-} from "../actions";
-
-/*const options = [
-  { key: "parcels", text: "Parcel Size", value: "parcels" },
-  { key: "coverage", text: "Site Cover %", value: "coverage" }
-];*/
+import { findParcels, toggleSearchPanel } from "../actions";
 
 export default class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      address: "",
       parcelSize: "",
       siteCoverage: "",
       delta: ""
     };
   }
 
+  changeAddress = event => {
+    this.setState({ address: event.target.value });
+  };
+
   changeParcelSize = event => {
     this.setState({ parcelSize: event.target.value });
-    // this.props.dispatch(changeParcelSize(event.target.value));
   };
 
   changeSiteCoverage = event => {
@@ -39,6 +33,7 @@ export default class Search extends Component {
   search = () => {
     this.props.dispatch(
       findParcels({
+        address: this.state.address,
         parcelSize: this.state.parcelSize,
         siteCoverage: this.state.siteCoverage,
         delta: this.state.delta
@@ -47,9 +42,9 @@ export default class Search extends Component {
   };
 
   close = () => {
-    console.log("close search clicked");
     this.props.dispatch(toggleSearchPanel());
     this.setState({
+      address: "",
       parcelSize: "",
       siteCoverage: "",
       delta: ""
@@ -58,15 +53,27 @@ export default class Search extends Component {
 
   render() {
     // error
-    const { parcelSize, siteCoverage, delta } = this.state;
+    const { address, parcelSize, siteCoverage, delta } = this.state;
     return (
       <>
         <div>
           <Input
+            id="address"
+            type="text"
             size="mini"
             labelPosition="left"
+            value={address}
+            onChange={this.changeAddress}
+          >
+            <Label>Address</Label>
+            <input autoComplete="off" />
+          </Input>
+          &nbsp;
+          <Input
             id="parcel-size"
             type="number"
+            size="mini"
+            labelPosition="left"
             value={parcelSize}
             onChange={this.changeParcelSize}
           >
@@ -75,11 +82,11 @@ export default class Search extends Component {
           </Input>
           &nbsp;
           <Input
+            id="site-coverage"
+            type="number"
             labelPosition="right"
             type="text"
             size="mini"
-            id="site-coverage"
-            type="number"
             value={siteCoverage}
             onChange={this.changeSiteCoverage}
           >
@@ -89,11 +96,11 @@ export default class Search extends Component {
           </Input>
           &nbsp;
           <Input
+            id="delta"
+            type="number"
             labelPosition="right"
             type="text"
             size="mini"
-            id="delta"
-            type="number"
             value={delta}
             onChange={this.changeDelta}
           >
@@ -102,7 +109,7 @@ export default class Search extends Component {
           </Input>
           &nbsp;
           <Button
-            disabled={!parcelSize && !siteCoverage && !delta}
+            disabled={!address && !parcelSize && !siteCoverage && !delta}
             size="mini"
             onClick={this.search}
           >

@@ -20,6 +20,25 @@ const mapReducer = (state = {}, action) => {
         isLayersLoading: false
       };
 
+    case actions.TOGGLE_LAYER:
+      let layers = [...state.layers];
+      const index = state.layers.indexOf(action.payload);
+      if (index === -1) {
+        layers.push(action.payload);
+      } else {
+        layers.splice(index, 1);
+      }
+      return {
+        ...state,
+        layers
+      };
+
+    case actions.SHOW_TOOLTIP:
+      return {
+        ...state,
+        tooltip: action.payload
+      };
+
     default:
       return state;
   }

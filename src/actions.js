@@ -1,22 +1,14 @@
 export const TOGGLE_SIDEBAR = "TOGGLE_SIDEBAR";
 
-// export const CHANGE_PARCEL_SIZE = "CHANGE_PARCEL_SIZE";
-// export const CHANGE_SITE_COVERAGE = "CHANGE_SITE_COVERAGE";
 export const FIND_PARCELS = "FIND_PARCELS";
 
 export const GOOGLE_MAPS_LOADED = "GOOGLE_MAPS_LOADED";
 export const LAYERS_LOADING = "LAYERS_LOADING";
 export const LAYERS_LOADED = "LAYERS_LOADED";
 
-/*export const changeParcelSize = (data) => ({
-  type: CHANGE_PARCEL_SIZE,
-  payload: data
-});
+export const TOGGLE_LAYER = "TOGGLE_LAYER";
 
-export const changeSiteCoverage = (data) => ({
-  type: CHANGE_SITE_COVERAGE,
-  payload: data
-});*/
+export const SHOW_TOOLTIP = "SHOW_TOOLTIP";
 
 export const findParcels = data => ({
   type: FIND_PARCELS,
@@ -37,4 +29,14 @@ export const layersLoading = () => ({
 
 export const layersLoaded = () => ({
   type: LAYERS_LOADED
+});
+
+export const toggleLayer = layer => ({
+  type: TOGGLE_LAYER,
+  payload: layer
+});
+
+export const showTooltip = tooltip => ({
+  type: SHOW_TOOLTIP,
+  payload: tooltip
 });

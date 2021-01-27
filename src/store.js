@@ -9,13 +9,20 @@ const initialState = {
   app: {
     // search: "",
     isSidebarVisible: false,
+    address: "",
     parcelSize: "",
     siteCoverage: "",
     delta: ""
   },
   map: {
     isGoogleMapsLoading: true,
-    isLayersLoading: false
+    isLayersLoading: false,
+    layers: ["parcels", "buildings", "zoning", "ocp"],
+    tooltip: {
+      content: "",
+      x: 0,
+      y: 0
+    }
   }
 };
 

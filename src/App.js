@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { Grid, Segment, Sidebar, Icon } from "semantic-ui-react";
+import { Segment, Sidebar } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 
 import "./App.css";
@@ -19,12 +19,14 @@ class App extends Component {
 
   render = () => {
     const { dispatch, app, map } = this.props;
-    console.log(
+    /*console.log(
       "App render: sidebar visible?",
       app.isSidebarVisible,
       "google maps loading?",
-      map.isGoogleMapsLoading
-    );
+      map.isGoogleMapsLoading,
+      "layers",
+      map.layers
+    );*/
     return (
       <Sidebar.Pushable as={Segment}>
         <Sidebar
@@ -41,11 +43,24 @@ class App extends Component {
           <Segment basic>
             <Map
               dispatch={dispatch}
+              layers={map.layers}
+              address={app.address}
               parcelSize={app.parcelSize}
               siteCoverage={app.siteCoverage}
               delta={app.delta}
               isGoogleMapsLoading={map.isGoogleMapsLoading}
             />
+            {map.tooltip.content !== "" && (
+              <div
+                className="tooltip"
+                style={{
+                  left: map.tooltip.x + "px",
+                  top: map.tooltip.y + "px"
+                }}
+              >
+                {map.tooltip.content}
+              </div>
+            )}
           </Segment>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
