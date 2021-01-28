@@ -1,7 +1,20 @@
 import React, { Component } from "react";
-import { Input, Label, Form, Button, Icon, Select } from "semantic-ui-react";
+import { Input, Label, Button, Icon, Dropdown } from "semantic-ui-react";
 
 import { findParcels, toggleSearchPanel } from "../actions";
+
+const options = [
+  { text: "CD", value: "CD" },
+  { text: "CM", value: "CM" },
+  { text: "CO", value: "CO" },
+  { text: "IN", value: "IN" },
+  { text: "NB", value: "NB" },
+  { text: "PA", value: "PA" },
+  { text: "PR", value: "PR" },
+  { text: "PRK", value: "PRK" },
+  { text: "RM", value: "RM" },
+  { text: "RS", value: "RS" }
+];
 
 export default class Search extends Component {
   constructor(props) {
@@ -10,7 +23,8 @@ export default class Search extends Component {
       address: "",
       parcelSize: "",
       siteCoverage: "",
-      delta: ""
+      delta: "",
+      zoneType: ""
     };
   }
 
@@ -30,13 +44,20 @@ export default class Search extends Component {
     this.setState({ delta: event.target.value });
   };
 
+  /*changeZoneType = event => {
+    this.setState({ zoneType: event.target.value });
+  };*/
+
+  changeZoneType = (e, { value }) => this.setState({ zoneType: value });
+
   search = () => {
     this.props.dispatch(
       findParcels({
         address: this.state.address,
         parcelSize: this.state.parcelSize,
         siteCoverage: this.state.siteCoverage,
-        delta: this.state.delta
+        delta: this.state.delta,
+        zoneType: this.state.zoneType
       })
     );
   };
@@ -47,70 +68,78 @@ export default class Search extends Component {
       address: "",
       parcelSize: "",
       siteCoverage: "",
-      delta: ""
+      delta: "",
+      zoneType: ""
     });
   };
 
   render() {
     // error
-    const { address, parcelSize, siteCoverage, delta } = this.state;
+    const { address, parcelSize, siteCoverage, delta, zoneType } = this.state;
     return (
       <>
-        <div>
+        <div className="ui form mini">
+          <Label>Address</Label>
           <Input
             id="address"
             type="text"
-            size="mini"
             labelPosition="left"
+            placeholder="Enter address"
             value={address}
             onChange={this.changeAddress}
           >
-            <Label>Address</Label>
             <input autoComplete="off" />
           </Input>
           &nbsp;
+          <Label>Parcel Size &#8805;</Label>
           <Input
             id="parcel-size"
             type="number"
-            size="mini"
             labelPosition="left"
             value={parcelSize}
             onChange={this.changeParcelSize}
           >
-            <Label>Parcel Size &#8805;</Label>
             <input autoComplete="off" />
           </Input>
           &nbsp;
+          <Label>Site Coverage &#60;</Label>
           <Input
             id="site-coverage"
             type="number"
             labelPosition="right"
-            type="text"
-            size="mini"
             value={siteCoverage}
             onChange={this.changeSiteCoverage}
           >
-            <Label>Site Coverage &#60;</Label>
             <input autoComplete="off" />
             <Label>%</Label>
           </Input>
           &nbsp;
+          <Label>Delta &#8805;</Label>
           <Input
             id="delta"
             type="number"
             labelPosition="right"
-            type="text"
-            size="mini"
             value={delta}
             onChange={this.changeDelta}
           >
-            <Label>Delta &#8805;</Label>
             <input autoComplete="off" />
           </Input>
           &nbsp;
+          <Label>Zone Type</Label>
+          <Dropdown
+            clearable
+            search
+            selection
+            placeholder="Choose option"
+            options={options}
+            value={zoneType}
+            onChange={this.changeZoneType}
+          />
+          &nbsp;
           <Button
-            disabled={!address && !parcelSize && !siteCoverage && !delta}
-            size="mini"
+            disabled={
+              !address && !parcelSize && !siteCoverage && !delta && !zoneType
+            }
             onClick={this.search}
           >
             Search

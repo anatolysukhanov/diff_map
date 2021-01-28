@@ -48,6 +48,7 @@ class App extends Component {
               parcelSize={app.parcelSize}
               siteCoverage={app.siteCoverage}
               delta={app.delta}
+              zoneType={app.zoneType}
               isGoogleMapsLoading={map.isGoogleMapsLoading}
             />
             {map.tooltip.content !== "" && (

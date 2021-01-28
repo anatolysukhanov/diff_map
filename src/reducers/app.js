@@ -8,7 +8,8 @@ const appReducer = (state = {}, action) => {
         address: action.payload.address,
         parcelSize: action.payload.parcelSize,
         siteCoverage: action.payload.siteCoverage,
-        delta: action.payload.delta
+        delta: action.payload.delta,
+        zoneType: action.payload.zoneType
       };
 
     case actions.TOGGLE_SIDEBAR:
@@ -19,7 +20,8 @@ const appReducer = (state = {}, action) => {
           address: "",
           parcelSize: "",
           siteCoverage: "",
-          delta: ""
+          delta: "",
+          zoneType: ""
         };
       } else {
         return {

@@ -12,7 +12,8 @@ const initialState = {
     address: "",
     parcelSize: "",
     siteCoverage: "",
-    delta: ""
+    delta: "",
+    zoneType: ""
   },
   map: {
     isGoogleMapsLoading: true,

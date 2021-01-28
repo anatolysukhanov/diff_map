@@ -30,7 +30,8 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: ""
+    // googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw"
+    googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE"
   });
 
   const [map, setMap] = React.useState(null);
@@ -40,6 +41,7 @@ function Map(props) {
   const prevParcelSize = usePrevious(props.parcelSize);
   const prevSiteCoverage = usePrevious(props.siteCoverage);
   const prevDelta = usePrevious(props.delta);
+  const prevZoneType = usePrevious(props.zoneType);
 
   const parcelsLayer = new CartoSQLLayer({
     id: "parcels",
@@ -89,8 +91,9 @@ function Map(props) {
             : { content: "", x: 0, y: 0 }
         )
       )
-    // onViewportLoad: () => console.log("onViewportLoad")
+    // onViewportLoad: () => console.log("parcels onViewportLoad")
   });
+
   const buildingsLayer = new CartoSQLLayer({
     id: "buildings",
     data: "select the_geom_webmercator, bldgtype, address from buildings",
@@ -118,9 +121,10 @@ function Map(props) {
         )
       )
   });
+
   const zoningLayer = new CartoSQLLayer({
     id: "zoning",
-    data: "select the_geom_webmercator, fsr from zones",
+    data: "select the_geom_webmercator, class_reso, fsr from zoning",
     opacity: 1,
     getFillColor: f => {
       switch (f.properties.fsr) {
@@ -145,7 +149,11 @@ function Map(props) {
         showTooltip(
           e.object
             ? {
-                content: e.object.properties.fsr,
+                content:
+                  "FSR: " +
+                  e.object.properties.fsr +
+                  ", Zone Type: " +
+                  e.object.properties.class_reso,
                 x: e.x,
                 y: e.y
               }
@@ -235,7 +243,10 @@ function Map(props) {
         if (props.delta) {
           query.push(`delta >= ${props.delta}`);
         }
-        data: layers.push(
+        if (props.zoneType) {
+          query.push(`zone_type = '${props.zoneType}'`);
+        }
+        layers.push(
           parcelsLayer.clone({
             data:
               query.length > 0
@@ -281,11 +292,13 @@ function Map(props) {
       (prevAddress !== props.address ||
         prevParcelSize !== props.parcelSize ||
         prevSiteCoverage !== props.siteCoverage ||
-        prevDelta !== props.delta) &&
+        prevDelta !== props.delta ||
+        prevZoneType !== props.zoneType) &&
       (props.address !== "" ||
         props.parcelSize !== "" ||
         props.siteCoverage !== "" ||
-        props.delta !== "")
+        props.delta !== "" ||
+        props.zoneType !== "")
     ) {
       let query = [];
       if (props.address) {
@@ -299,6 +312,9 @@ function Map(props) {
       }
       if (props.delta) {
         query.push(`delta >= ${props.delta}`);
+      }
+      if (props.zoneType) {
+        query.push(`zone_type = '${props.zoneType}'`);
       }
       // console.log("new search, query:", query.join(" AND "));
       deckOverlay.setProps({
@@ -323,7 +339,8 @@ function Map(props) {
       props.address === "" &&
       props.parcelSize === "" &&
       props.siteCoverage === "" &&
-      props.delta === ""
+      props.delta === "" &&
+      props.zoneType === ""
     ) {
       // console.log("back to default search");
       deckOverlay.setProps({
@@ -344,7 +361,13 @@ function Map(props) {
         ]
       });
     }
-  }, [props.address, props.parcelSize, props.siteCoverage, props.delta]);
+  }, [
+    props.address,
+    props.parcelSize,
+    props.siteCoverage,
+    props.delta,
+    props.zoneType
+  ]);
 
   const onUnmount = React.useCallback(function callback(map) {
     setMap(null);
