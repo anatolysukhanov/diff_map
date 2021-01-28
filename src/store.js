@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
-//import thunk from "redux-thunk";
+// import thunk from "redux-thunk";
 // import { taskMiddleware } from "react-palm/tasks";
 
 import appReducer from "./reducers/app";
@@ -7,20 +7,19 @@ import mapReducer from "./reducers/map";
 
 const initialState = {
   app: {
-    // search: "",
     isSidebarVisible: false,
     address: "",
     parcelSize: "",
     siteCoverage: "",
     delta: "",
-    zoneType: ""
+    zoneType: "",
+    isLoading: true
   },
   map: {
     isGoogleMapsLoading: true,
-    isLayersLoading: false,
     layers: ["parcels", "buildings", "zoning", "ocp"],
     tooltip: {
-      content: "",
+      content: null,
       x: 0,
       y: 0
     }

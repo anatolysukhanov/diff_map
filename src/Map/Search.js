@@ -74,7 +74,6 @@ export default class Search extends Component {
   };
 
   render() {
-    // error
     const { address, parcelSize, siteCoverage, delta, zoneType } = this.state;
     return (
       <>

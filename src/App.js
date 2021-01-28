@@ -50,8 +50,9 @@ class App extends Component {
               delta={app.delta}
               zoneType={app.zoneType}
               isGoogleMapsLoading={map.isGoogleMapsLoading}
+              isLoading={app.isLoading}
             />
-            {map.tooltip.content !== "" && (
+            {map.tooltip.content !== null && (
               <div
                 className="tooltip"
                 style={{
@@ -59,7 +60,9 @@ class App extends Component {
                   top: map.tooltip.y + "px"
                 }}
               >
-                {map.tooltip.content}
+                {map.tooltip.content.map((content, index) => (
+                  <div key={index}>{content}</div>
+                ))}
               </div>
             )}
           </Segment>

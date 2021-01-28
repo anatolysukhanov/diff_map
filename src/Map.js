@@ -6,8 +6,11 @@ import { Button, Icon } from "semantic-ui-react";
 
 import MapControl from "./Map/Control";
 import Layers from "./Map/Layers";
-import { showTooltip, toggleSearchPanel } from "./actions";
 import LegendControl from "./Map/Legend";
+
+import { showTooltip, toggleSearchPanel, layersLoaded } from "./actions";
+
+import loading from "./loading.gif";
 
 setDefaultCredentials({
   username: "anatolysukhanov",
@@ -37,6 +40,7 @@ function Map(props) {
   const [map, setMap] = React.useState(null);
   const [deckOverlay, setDeckOverlay] = React.useState(null);
 
+  // const prevIsLoading = usePrevious(props.isLoading);
   const prevAddress = usePrevious(props.address);
   const prevParcelSize = usePrevious(props.parcelSize);
   const prevSiteCoverage = usePrevious(props.siteCoverage);
@@ -75,23 +79,25 @@ function Map(props) {
         showTooltip(
           e.object
             ? {
-                content:
-                  (e.object.properties.delta !== undefined
+                content: [
+                  e.object.properties.delta !== undefined
                     ? "Delta:" + e.object.properties.delta
-                    : "No delta") +
-                  ", Site Coverage:" +
-                  e.object.properties.coverage.toFixed(2) +
-                  "%, Area: " +
-                  e.object.properties.area.toFixed(0) +
-                  " ft" +
-                  String.fromCharCode(178),
+                    : "No delta",
+                  "Site Coverage:" +
+                    e.object.properties.coverage.toFixed(2) +
+                    "%",
+                  "Area: " +
+                    e.object.properties.area.toFixed(0) +
+                    " ft" +
+                    String.fromCharCode(178)
+                ],
                 x: e.x,
                 y: e.y
               }
-            : { content: "", x: 0, y: 0 }
+            : { content: null, x: 0, y: 0 }
         )
-      )
-    // onViewportLoad: () => console.log("parcels onViewportLoad")
+      ),
+    onViewportLoad: () => props.dispatch(layersLoaded())
   });
 
   const buildingsLayer = new CartoSQLLayer({
@@ -109,15 +115,16 @@ function Map(props) {
         showTooltip(
           e.object
             ? {
-                content:
-                  e.object.properties.address !== undefined
-                    ? e.object.properties.address +
-                      ` (${e.object.properties.bldgtype})`
-                    : e.object.properties.bldgtype,
+                content: [
+                  ...(e.object.properties.address !== undefined
+                    ? ["Address: " + e.object.properties.address]
+                    : []),
+                  "Type: " + e.object.properties.bldgtype
+                ],
                 x: e.x,
                 y: e.y
               }
-            : { content: "", x: 0, y: 0 }
+            : { content: null, x: 0, y: 0 }
         )
       )
   });
@@ -149,15 +156,14 @@ function Map(props) {
         showTooltip(
           e.object
             ? {
-                content:
-                  "FSR: " +
-                  e.object.properties.fsr +
-                  ", Zone Type: " +
-                  e.object.properties.class_reso,
+                content: [
+                  "FSR: " + e.object.properties.fsr,
+                  "Zone Type: " + e.object.properties.class_reso
+                ],
                 x: e.x,
                 y: e.y
               }
-            : { content: "", x: 0, y: 0 }
+            : { content: null, x: 0, y: 0 }
         )
       )
   });
@@ -199,11 +205,11 @@ function Map(props) {
         showTooltip(
           e.object
             ? {
-                content: e.object.properties.fsr,
+                content: ["FSR: " + e.object.properties.fsr],
                 x: e.x,
                 y: e.y
               }
-            : { content: "", x: 0, y: 0 }
+            : { content: null, x: 0, y: 0 }
         )
       )
   });
@@ -387,85 +393,92 @@ function Map(props) {
     props.dispatch(toggleSearchPanel());
   };
 
-  // console.log("Map render");
+  console.log("Map render", props.isLoading);
 
   return isLoaded ? (
-    <GoogleMap
-      mapContainerStyle={{
-        width: "100%",
-        height: "100%"
-      }}
-      center={center}
-      zoom={13}
-      options={{
-        zoomControlOptions: {
-          position: window.google.maps.ControlPosition.LEFT_BOTTOM
-        },
-        streetViewControlOptions: {
-          position: window.google.maps.ControlPosition.LEFT_BOTTOM
-        },
-        rotateControlOptions: {
-          position: window.google.maps.ControlPosition.LEFT_BOTTOM
-        }
-      }}
-      onLoad={onLoad}
-      onUnmount={onUnmount}
-      onTiltChanged={onTiltChanged}
-    >
-      <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
-        <Layers dispatch={props.dispatch} layers={props.layers} />
-      </MapControl>
-      <MapControl position={window.google.maps.ControlPosition.TOP_CENTER}>
-        <Button
-          icon
-          size="mini"
-          onClick={openSearchPanel}
-          id="open-search-panel-btn"
-        >
-          <Icon name="search" />
-        </Button>
-      </MapControl>
-      <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
-        <LegendControl
-          title="DELTA"
-          values={[
-            { value: ">= -1.95", color: "#CCF5F5" },
-            { value: ">= -1.1", color: "#A6C6D3" },
-            { value: ">= -0.25", color: "#8097B1" },
-            { value: ">= 0.6", color: "#5A6890" },
-            { value: ">= 1.45", color: "#34396E" },
-            { value: ">= 2.3", color: "#0E0B4D" }
-          ]}
-        />
-      </MapControl>
-      <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
-        <LegendControl
-          title="OCP"
-          values={[
-            { value: "0", color: "#F5CCCC" },
-            { value: "0.35", color: "#E4B4B6" },
-            { value: "0.55", color: "#D39CA1" },
-            { value: "0.8", color: "#C2858B" },
-            { value: "1", color: "#B26D76" },
-            { value: "1.2", color: "#A15561" },
-            { value: "1.75", color: "#903E4B" },
-            { value: "2.5", color: "#7F2636" },
-            { value: "3.5", color: "#6F0F21" }
-          ]}
-        />
-      </MapControl>
-      <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
-        <LegendControl
-          title="ZONES"
-          values={[
-            { value: "0", color: "#11ED30" },
-            { value: "0.35", color: "#12B123" },
-            { value: "1.3", color: "#137616" },
-            { value: "2.5", color: "#143B0A" }
-          ]}
-        />
-      </MapControl>
-    </GoogleMap>
+    <>
+      <GoogleMap
+        mapContainerStyle={{
+          width: "100%",
+          height: "100%"
+        }}
+        center={center}
+        zoom={13}
+        options={{
+          zoomControlOptions: {
+            position: window.google.maps.ControlPosition.LEFT_BOTTOM
+          },
+          streetViewControlOptions: {
+            position: window.google.maps.ControlPosition.LEFT_BOTTOM
+          },
+          rotateControlOptions: {
+            position: window.google.maps.ControlPosition.LEFT_BOTTOM
+          }
+        }}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
+        onTiltChanged={onTiltChanged}
+      >
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
+          <Layers dispatch={props.dispatch} layers={props.layers} />
+        </MapControl>
+        <MapControl position={window.google.maps.ControlPosition.TOP_CENTER}>
+          <Button
+            icon
+            size="mini"
+            onClick={openSearchPanel}
+            id="open-search-panel-btn"
+          >
+            <Icon name="search" />
+          </Button>
+        </MapControl>
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
+          <LegendControl
+            title="DELTA"
+            values={[
+              { value: ">= -1.95", color: "#CCF5F5" },
+              { value: ">= -1.1", color: "#A6C6D3" },
+              { value: ">= -0.25", color: "#8097B1" },
+              { value: ">= 0.6", color: "#5A6890" },
+              { value: ">= 1.45", color: "#34396E" },
+              { value: ">= 2.3", color: "#0E0B4D" }
+            ]}
+          />
+        </MapControl>
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
+          <LegendControl
+            title="OCP"
+            values={[
+              { value: "0", color: "#F5CCCC" },
+              { value: "0.35", color: "#E4B4B6" },
+              { value: "0.55", color: "#D39CA1" },
+              { value: "0.8", color: "#C2858B" },
+              { value: "1", color: "#B26D76" },
+              { value: "1.2", color: "#A15561" },
+              { value: "1.75", color: "#903E4B" },
+              { value: "2.5", color: "#7F2636" },
+              { value: "3.5", color: "#6F0F21" }
+            ]}
+          />
+        </MapControl>
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
+          <LegendControl
+            title="ZONES"
+            values={[
+              { value: "0", color: "#11ED30" },
+              { value: "0.35", color: "#12B123" },
+              { value: "1.3", color: "#137616" },
+              { value: "2.5", color: "#143B0A" }
+            ]}
+          />
+        </MapControl>
+      </GoogleMap>
+      {props.isLoading === true && (
+        <div className="loading-container">
+          <img src={loading} className="loading" />
+        </div>
+      )}
+    </>
   ) : (
     <></>
   );

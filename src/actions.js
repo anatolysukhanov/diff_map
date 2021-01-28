@@ -1,13 +1,9 @@
 export const TOGGLE_SIDEBAR = "TOGGLE_SIDEBAR";
 
-export const FIND_PARCELS = "FIND_PARCELS";
-
 export const GOOGLE_MAPS_LOADED = "GOOGLE_MAPS_LOADED";
-export const LAYERS_LOADING = "LAYERS_LOADING";
+export const FIND_PARCELS = "FIND_PARCELS";
 export const LAYERS_LOADED = "LAYERS_LOADED";
-
 export const TOGGLE_LAYER = "TOGGLE_LAYER";
-
 export const SHOW_TOOLTIP = "SHOW_TOOLTIP";
 
 export const findParcels = data => ({
@@ -21,10 +17,6 @@ export const toggleSearchPanel = () => ({
 
 export const googleMapsLoaded = () => ({
   type: GOOGLE_MAPS_LOADED
-});
-
-export const layersLoading = () => ({
-  type: LAYERS_LOADING
 });
 
 export const layersLoaded = () => ({

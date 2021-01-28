@@ -8,18 +8,6 @@ const mapReducer = (state = {}, action) => {
         isGoogleMapsLoading: false
       };
 
-    case actions.LAYERS_LOADING:
-      return {
-        ...state,
-        isLayersLoading: true
-      };
-
-    case actions.LAYERS_LOADED:
-      return {
-        ...state,
-        isLayersLoading: false
-      };
-
     case actions.TOGGLE_LAYER:
       let layers = [...state.layers];
       const index = state.layers.indexOf(action.payload);
