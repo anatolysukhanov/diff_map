@@ -33,8 +33,8 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    // googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw"
-    googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE"
+    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw"
+    // googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE"
   });
 
   const [map, setMap] = React.useState(null);
@@ -49,7 +49,8 @@ function Map(props) {
 
   const parcelsLayer = new CartoSQLLayer({
     id: "parcels",
-    data: "select the_geom_webmercator, area, coverage, delta from parcels",
+    data:
+      "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels",
     opacity: 1,
     // getFillColor: [0, 255, 255],
     getFillColor: f => {
@@ -80,6 +81,9 @@ function Map(props) {
           e.object
             ? {
                 content: [
+                  ...(e.object.properties.address !== undefined
+                    ? ["Address: " + e.object.properties.address]
+                    : []),
                   e.object.properties.delta !== undefined
                     ? "Delta:" + e.object.properties.delta
                     : "No delta",
@@ -89,7 +93,8 @@ function Map(props) {
                   "Area: " +
                     e.object.properties.area.toFixed(0) +
                     " ft" +
-                    String.fromCharCode(178)
+                    String.fromCharCode(178),
+                  "Zone Type: " + e.object.properties.zone_type
                 ],
                 x: e.x,
                 y: e.y
@@ -256,10 +261,10 @@ function Map(props) {
           parcelsLayer.clone({
             data:
               query.length > 0
-                ? `select the_geom_webmercator, area, coverage, delta from parcels WHERE ${query.join(
+                ? `select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels WHERE ${query.join(
                     " AND "
                   )}`
-                : "select the_geom_webmercator, area, coverage, delta from parcels",
+                : "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels",
             visible: true
           })
         );
@@ -326,7 +331,7 @@ function Map(props) {
       deckOverlay.setProps({
         layers: [
           parcelsLayer.clone({
-            data: `select the_geom_webmercator, area, coverage, delta from parcels WHERE ${query.join(
+            data: `select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels WHERE ${query.join(
               " AND "
             )}`
           }),
@@ -353,7 +358,7 @@ function Map(props) {
         layers: [
           parcelsLayer.clone({
             data:
-              "select the_geom_webmercator, area, coverage, delta from parcels"
+              "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels"
           }),
           buildingsLayer.clone({
             visible: props.layers.includes("buildings") === true
