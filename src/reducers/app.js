@@ -34,7 +34,12 @@ const appReducer = (state = {}, action) => {
           siteCoverage: "",
           delta: "",
           zoneType: "",
-          isLoading: true
+          isLoading:
+            state.address !== "" ||
+            state.parcelSize !== "" ||
+            state.siteCoverage !== "" ||
+            state.delta !== "" ||
+            state.zoneType !== ""
         };
       } else {
         return {

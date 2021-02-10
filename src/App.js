@@ -50,6 +50,7 @@ class App extends Component {
               delta={app.delta}
               zoneType={app.zoneType}
               isGoogleMapsLoading={map.isGoogleMapsLoading}
+              isSidebarVisible={app.isSidebarVisible}
               isLoading={app.isLoading}
             />
             {map.tooltip.content !== null && (

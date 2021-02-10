@@ -12,7 +12,7 @@ export default class Layers extends Component {
   };
 
   render() {
-    const { layers } = this.props;
+    const { layers, isSidebarVisible } = this.props;
     return (
       <div className="toggle-layers">
         <div className="toggle-layer">
@@ -25,6 +25,7 @@ export default class Layers extends Component {
               this.handleChange(e.target.name);
               // e.target.checked
             }}
+            disabled={isSidebarVisible}
           />
         </div>
         <div className="toggle-layer">

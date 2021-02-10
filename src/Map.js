@@ -41,7 +41,7 @@ function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
-    // googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE"
+    // googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
     libraries
   });
 
@@ -357,6 +357,11 @@ function Map(props) {
         ]
       });
     } else if (
+      (prevAddress !== props.address ||
+        prevParcelSize !== props.parcelSize ||
+        prevSiteCoverage !== props.siteCoverage ||
+        prevDelta !== props.delta ||
+        prevZoneType !== props.zoneType) &&
       props.address === "" &&
       props.parcelSize === "" &&
       props.siteCoverage === "" &&
@@ -422,7 +427,7 @@ function Map(props) {
       }
       setPosition(place.geometry.location);
     } else {
-      console.log("Autocomplete is not loaded yet!");
+      console.log("Autocomplete is not loaded yet");
     }
   };
 
@@ -431,7 +436,8 @@ function Map(props) {
     props.dispatch(toggleSearchPanel());
   };
 
-  // console.log("Map render", props.isLoading);
+  // console.log("Map render: props.isLoading?", props.isLoading);
+
   return isLoaded ? (
     <>
       <GoogleMap
@@ -463,6 +469,11 @@ function Map(props) {
             trigger={
               <Button
                 id="open-search-panel-btn"
+                className={
+                  props.layers.includes("parcels") === true
+                    ? "ui button"
+                    : "ui disabled button"
+                }
                 icon
                 size="mini"
                 onClick={openSearchPanel}
@@ -475,7 +486,11 @@ function Map(props) {
           />
         </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
-          <Layers dispatch={props.dispatch} layers={props.layers} />
+          <Layers
+            dispatch={props.dispatch}
+            layers={props.layers}
+            isSidebarVisible={props.isSidebarVisible}
+          />
         </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
           <Autocomplete
