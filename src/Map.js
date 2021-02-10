@@ -1,8 +1,13 @@
 import React from "react";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  useJsApiLoader,
+  Autocomplete,
+  Marker
+} from "@react-google-maps/api";
 import { GoogleMapsOverlay } from "@deck.gl/google-maps";
 import { CartoSQLLayer, setDefaultCredentials } from "@deck.gl/carto";
-import { Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Popup } from "semantic-ui-react";
 
 import MapControl from "./Map/Control";
 import Layers from "./Map/Layers";
@@ -22,6 +27,8 @@ const center = {
   lng: -123.005
 };
 
+const libraries = ["places"];
+
 function usePrevious(value) {
   const ref = React.useRef();
   React.useEffect(() => {
@@ -33,12 +40,15 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw"
+    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
     // googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE"
+    libraries
   });
 
   const [map, setMap] = React.useState(null);
+  const [autocomplete, setAutocomplete] = React.useState(null);
   const [deckOverlay, setDeckOverlay] = React.useState(null);
+  const [position, setPosition] = React.useState(null);
 
   // const prevIsLoading = usePrevious(props.isLoading);
   const prevAddress = usePrevious(props.address);
@@ -393,13 +403,35 @@ function Map(props) {
     }
   };
 
+  const onAutocompleteLoad = autocomplete => {
+    setAutocomplete(autocomplete);
+  };
+
+  const onBoundsChanged = () => {
+    autocomplete.setBounds(map.getBounds());
+  };
+
+  const onPlaceChanged = () => {
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      if (place.geometry.viewport) {
+        map.fitBounds(place.geometry.viewport);
+      } else {
+        map.setCenter(place.geometry.location);
+        map.setZoom(17);
+      }
+      setPosition(place.geometry.location);
+    } else {
+      console.log("Autocomplete is not loaded yet!");
+    }
+  };
+
   const openSearchPanel = () => {
     // console.log("open search clicked");
     props.dispatch(toggleSearchPanel());
   };
 
-  console.log("Map render", props.isLoading);
-
+  // console.log("Map render", props.isLoading);
   return isLoaded ? (
     <>
       <GoogleMap
@@ -423,19 +455,39 @@ function Map(props) {
         onLoad={onLoad}
         onUnmount={onUnmount}
         onTiltChanged={onTiltChanged}
+        onBoundsChanged={onBoundsChanged}
       >
+        <MapControl position={window.google.maps.ControlPosition.TOP_CENTER}>
+          <Popup
+            size="mini"
+            trigger={
+              <Button
+                id="open-search-panel-btn"
+                icon
+                size="mini"
+                onClick={openSearchPanel}
+              >
+                <Icon name="search" />
+              </Button>
+            }
+            content="Parcels Search"
+            position="bottom center"
+          />
+        </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
           <Layers dispatch={props.dispatch} layers={props.layers} />
         </MapControl>
-        <MapControl position={window.google.maps.ControlPosition.TOP_CENTER}>
-          <Button
-            icon
-            size="mini"
-            onClick={openSearchPanel}
-            id="open-search-panel-btn"
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
+          <Autocomplete
+            onLoad={onAutocompleteLoad}
+            onPlaceChanged={onPlaceChanged}
           >
-            <Icon name="search" />
-          </Button>
+            <input
+              type="text"
+              placeholder="Enter Address"
+              className="autocomplete"
+            />
+          </Autocomplete>
         </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
           <LegendControl
@@ -477,6 +529,15 @@ function Map(props) {
             ]}
           />
         </MapControl>
+
+        {position && (
+          <Marker
+            position={{
+              lat: position.lat(),
+              lng: position.lng()
+            }}
+          />
+        )}
       </GoogleMap>
       {props.isLoading === true && (
         <div className="loading-container">
