@@ -24,6 +24,12 @@ const appReducer = (state = {}, action) => {
         isLoading: false
       };
 
+    case actions.CHANGE_BUILDING_TYPE:
+      return {
+        ...state,
+        isLoading: true
+      };
+
     case actions.TOGGLE_SIDEBAR:
       if (state.isSidebarVisible) {
         return {

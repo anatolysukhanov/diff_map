@@ -4,6 +4,7 @@ export const GOOGLE_MAPS_LOADED = "GOOGLE_MAPS_LOADED";
 export const FIND_PARCELS = "FIND_PARCELS";
 export const LAYERS_LOADED = "LAYERS_LOADED";
 export const TOGGLE_LAYER = "TOGGLE_LAYER";
+export const CHANGE_BUILDING_TYPE = "CHANGE_BUILDING_TYPE";
 export const SHOW_TOOLTIP = "SHOW_TOOLTIP";
 
 export const findParcels = data => ({
@@ -23,9 +24,17 @@ export const layersLoaded = () => ({
   type: LAYERS_LOADED
 });
 
-export const toggleLayer = layer => ({
+export const toggleLayer = (layer, checked) => ({
   type: TOGGLE_LAYER,
-  payload: layer
+  payload: {
+    layer,
+    checked
+  }
+});
+
+export const changeBuildingType = type => ({
+  type: CHANGE_BUILDING_TYPE,
+  payload: type
 });
 
 export const showTooltip = tooltip => ({

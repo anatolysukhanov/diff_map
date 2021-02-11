@@ -44,10 +44,6 @@ export default class Search extends Component {
     this.setState({ delta: event.target.value });
   };
 
-  /*changeZoneType = event => {
-    this.setState({ zoneType: event.target.value });
-  };*/
-
   changeZoneType = (e, { value }) => this.setState({ zoneType: value });
 
   search = () => {
@@ -129,7 +125,7 @@ export default class Search extends Component {
             clearable
             search
             selection
-            placeholder="Choose option"
+            placeholder="Choose zone type"
             options={options}
             value={zoneType}
             onChange={this.changeZoneType}

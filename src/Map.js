@@ -40,8 +40,8 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
-    // googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
+    // googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
+    googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
     libraries
   });
 
@@ -50,12 +50,12 @@ function Map(props) {
   const [deckOverlay, setDeckOverlay] = React.useState(null);
   const [position, setPosition] = React.useState(null);
 
-  // const prevIsLoading = usePrevious(props.isLoading);
   const prevAddress = usePrevious(props.address);
   const prevParcelSize = usePrevious(props.parcelSize);
   const prevSiteCoverage = usePrevious(props.siteCoverage);
   const prevDelta = usePrevious(props.delta);
   const prevZoneType = usePrevious(props.zoneType);
+  const prevBuildingType = usePrevious(props.buildingType);
 
   const parcelsLayer = new CartoSQLLayer({
     id: "parcels",
@@ -141,7 +141,8 @@ function Map(props) {
               }
             : { content: null, x: 0, y: 0 }
         )
-      )
+      ),
+    onViewportLoad: () => props.dispatch(layersLoaded())
   });
 
   const zoningLayer = new CartoSQLLayer({
@@ -283,7 +284,16 @@ function Map(props) {
       }
 
       if (props.layers.includes("buildings") === true) {
-        layers.push(buildingsLayer.clone({ visible: true }));
+        if (props.buildingType !== "") {
+          layers.push(
+            buildingsLayer.clone({
+              visible: true,
+              data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.buildingType}'`
+            })
+          );
+        } else {
+          layers.push(buildingsLayer.clone({ visible: true }));
+        }
       } else {
         layers.push(buildingsLayer.clone({ visible: false }));
       }
@@ -395,6 +405,28 @@ function Map(props) {
     props.zoneType
   ]);
 
+  React.useEffect(() => {
+    if (!deckOverlay || props.layers.includes("buildings") === false) return;
+    if (props.buildingType !== "") {
+      deckOverlay.setProps({
+        layers: [
+          buildingsLayer.clone({
+            data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.buildingType}'`
+          })
+        ]
+      });
+    } else {
+      deckOverlay.setProps({
+        layers: [
+          buildingsLayer.clone({
+            data:
+              "select the_geom_webmercator, bldgtype, address from buildings"
+          })
+        ]
+      });
+    }
+  }, [props.buildingType]);
+
   const onUnmount = React.useCallback(function callback(map) {
     setMap(null);
   }, []);
@@ -486,13 +518,6 @@ function Map(props) {
           />
         </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
-          <Layers
-            dispatch={props.dispatch}
-            layers={props.layers}
-            isSidebarVisible={props.isSidebarVisible}
-          />
-        </MapControl>
-        <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
           <Autocomplete
             onLoad={onAutocompleteLoad}
             onPlaceChanged={onPlaceChanged}
@@ -503,6 +528,14 @@ function Map(props) {
               className="autocomplete"
             />
           </Autocomplete>
+        </MapControl>
+        <MapControl position={window.google.maps.ControlPosition.RIGHT_TOP}>
+          <Layers
+            dispatch={props.dispatch}
+            layers={props.layers}
+            buildingType={props.buildingType}
+            isSidebarVisible={props.isSidebarVisible}
+          />
         </MapControl>
         <MapControl position={window.google.maps.ControlPosition.RIGHT_BOTTOM}>
           <LegendControl

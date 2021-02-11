@@ -44,6 +44,7 @@ class App extends Component {
             <Map
               dispatch={dispatch}
               layers={map.layers}
+              buildingType={map.buildingType}
               address={app.address}
               parcelSize={app.parcelSize}
               siteCoverage={app.siteCoverage}

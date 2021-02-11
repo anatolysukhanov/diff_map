@@ -202,6 +202,7 @@ body {
   border-radius: 3px;
   padding: 5px;
   margin-right: 10px;
+  margin-top: 5px;
 }
 
 .toggle-layers > div > *:first-child {
@@ -229,5 +230,4 @@ body {
   outline: none;
   text-overflow: ellipsis;
   margin-right: 10px;
-  margin-top: 10px;
 }

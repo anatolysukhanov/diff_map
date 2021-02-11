@@ -18,6 +18,7 @@ const initialState = {
   map: {
     isGoogleMapsLoading: true,
     layers: ["parcels", "buildings", "zoning", "ocp"],
+    buildingType: "",
     tooltip: {
       content: null,
       x: 0,
