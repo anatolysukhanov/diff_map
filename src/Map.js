@@ -29,6 +29,24 @@ const center = {
 
 const libraries = ["places"];
 
+const getParcelFillColor = f => {
+  if (f.properties.delta === undefined) {
+    return [0, 0, 0, 0];
+  } else if (f.properties.delta < -1.1) {
+    return [204, 245, 245];
+  } else if (f.properties.delta < -0.25) {
+    return [166, 198, 211];
+  } else if (f.properties.delta < 0.6) {
+    return [128, 151, 177];
+  } else if (f.properties.delta < 1.45) {
+    return [90, 104, 144];
+  } else if (f.properties.delta < 2.3) {
+    return [52, 57, 110];
+  } else {
+    return [14, 11, 77];
+  }
+};
+
 function usePrevious(value) {
   const ref = React.useRef();
   React.useEffect(() => {
@@ -40,8 +58,8 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
-    //  googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
+    // googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
+    googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
     libraries
   });
 
@@ -63,23 +81,7 @@ function Map(props) {
       "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels",
     opacity: 1,
     // getFillColor: [0, 255, 255],
-    getFillColor: f => {
-      if (f.properties.delta === undefined) {
-        return [0, 0, 0, 0];
-      } else if (f.properties.delta < -1.1) {
-        return [204, 245, 245];
-      } else if (f.properties.delta < -0.25) {
-        return [166, 198, 211];
-      } else if (f.properties.delta < 0.6) {
-        return [128, 151, 177];
-      } else if (f.properties.delta < 1.45) {
-        return [90, 104, 144];
-      } else if (f.properties.delta < 2.3) {
-        return [52, 57, 110];
-      } else {
-        return [14, 11, 77];
-      }
-    },
+    getFillColor: getParcelFillColor,
     lineWidthUnits: "pixels",
     getLineWidth: 1,
     lineWidthMinPixels: 1,
@@ -284,7 +286,6 @@ function Map(props) {
                     " AND "
                   )}`
                 : "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels",
-            getFillColor: [255, 0, 0],
             visible: true
           })
         );
