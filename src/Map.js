@@ -40,8 +40,8 @@ function usePrevious(value) {
 function Map(props) {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    // googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
-    googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
+    googleMapsApiKey: "AIzaSyD6L9qpPAS-M340DzgHfIkzBWvtKy7OsRw",
+    //  googleMapsApiKey: "AIzaSyAi9fvZy7EimDlhUbmAIPWx3kI1xNgXFiE",
     libraries
   });
 
@@ -284,6 +284,7 @@ function Map(props) {
                     " AND "
                   )}`
                 : "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels",
+            getFillColor: [255, 0, 0],
             visible: true
           })
         );
@@ -366,7 +367,8 @@ function Map(props) {
           parcelsLayer.clone({
             data: `select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels WHERE ${query.join(
               " AND "
-            )}`
+            )}`,
+            getFillColor: [255, 0, 0]
           }),
           buildingsLayer.clone({
             visible: props.layers.includes("buildings") === true
