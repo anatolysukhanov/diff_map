@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import { Input, Label, Button, Icon, Dropdown } from "semantic-ui-react";
 
 import { findParcels, toggleSearchPanel } from "../actions";
+import { buildingTypes } from "../data";
 
-const options = [
+const zoneTypes = [
   { text: "CD", value: "CD" },
   { text: "CM", value: "CM" },
   { text: "CO", value: "CO" },
@@ -24,7 +25,8 @@ export default class Search extends Component {
       parcelSize: "",
       siteCoverage: "",
       delta: "",
-      zoneType: ""
+      zoneType: "",
+      buildingType: ""
     };
   }
 
@@ -46,6 +48,8 @@ export default class Search extends Component {
 
   changeZoneType = (e, { value }) => this.setState({ zoneType: value });
 
+  changeBuildingType = (e, { value }) => this.setState({ buildingType: value });
+
   search = () => {
     this.props.dispatch(
       findParcels({
@@ -53,7 +57,8 @@ export default class Search extends Component {
         parcelSize: this.state.parcelSize,
         siteCoverage: this.state.siteCoverage,
         delta: this.state.delta,
-        zoneType: this.state.zoneType
+        zoneType: this.state.zoneType,
+        buildingType: this.state.buildingType
       })
     );
   };
@@ -65,12 +70,20 @@ export default class Search extends Component {
       parcelSize: "",
       siteCoverage: "",
       delta: "",
-      zoneType: ""
+      zoneType: "",
+      buildingType: ""
     });
   };
 
   render() {
-    const { address, parcelSize, siteCoverage, delta, zoneType } = this.state;
+    const {
+      address,
+      parcelSize,
+      siteCoverage,
+      delta,
+      zoneType,
+      buildingType
+    } = this.state;
     return (
       <>
         <div className="ui form mini">
@@ -125,15 +138,31 @@ export default class Search extends Component {
             clearable
             search
             selection
-            placeholder="Choose zone type"
-            options={options}
+            placeholder="Choose type"
+            options={zoneTypes}
             value={zoneType}
             onChange={this.changeZoneType}
           />
           &nbsp;
+          <Label>Building Type</Label>
+          <Dropdown
+            clearable
+            search
+            selection
+            placeholder="Choose type"
+            options={buildingTypes}
+            value={buildingType}
+            onChange={this.changeBuildingType}
+          />
+          &nbsp;
           <Button
             disabled={
-              !address && !parcelSize && !siteCoverage && !delta && !zoneType
+              !address &&
+              !parcelSize &&
+              !siteCoverage &&
+              !delta &&
+              !zoneType &&
+              !buildingType
             }
             onClick={this.search}
           >

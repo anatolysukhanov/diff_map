@@ -13,6 +13,7 @@ const initialState = {
     siteCoverage: "",
     delta: "",
     zoneType: "",
+    buildingType: "",
     isLoading: true
   },
   map: {

@@ -18,8 +18,8 @@ import { showTooltip, toggleSearchPanel, layersLoaded } from "./actions";
 import loading from "./loading.gif";
 
 setDefaultCredentials({
-  username: "anatolysukhanov",
-  apiKey: "efae24f5d54f80890dff448d2cff5b958f658e39"
+  username: "anatoly-sukhanov",
+  apiKey: "0cef1e513ed798f37a15e5eb8eec26ba19a643cc"
 });
 
 const center = {
@@ -60,7 +60,7 @@ function Map(props) {
   const parcelsLayer = new CartoSQLLayer({
     id: "parcels",
     data:
-      "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels",
+      "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels",
     opacity: 1,
     // getFillColor: [0, 255, 255],
     getFillColor: f => {
@@ -104,7 +104,12 @@ function Map(props) {
                     e.object.properties.area.toFixed(0) +
                     " ft" +
                     String.fromCharCode(178),
-                  "Zone Type: " + e.object.properties.zone_type
+                  e.object.properties.zone_type !== undefined
+                    ? "Zone Type: " + e.object.properties.zone_type
+                    : "No zone type",
+                  e.object.properties.building_type !== undefined
+                    ? "Building Type: " + e.object.properties.building_type
+                    : "No building type"
                 ],
                 x: e.x,
                 y: e.y
@@ -268,14 +273,17 @@ function Map(props) {
         if (props.zoneType) {
           query.push(`zone_type = '${props.zoneType}'`);
         }
+        if (props.buildingType) {
+          query.push(`building_type = '${props.buildingType}'`);
+        }
         layers.push(
           parcelsLayer.clone({
             data:
               query.length > 0
-                ? `select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels WHERE ${query.join(
+                ? `select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels WHERE ${query.join(
                     " AND "
                   )}`
-                : "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels",
+                : "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels",
             visible: true
           })
         );
@@ -284,11 +292,11 @@ function Map(props) {
       }
 
       if (props.layers.includes("buildings") === true) {
-        if (props.buildingType !== "") {
+        if (props.viewByBuildingType !== "") {
           layers.push(
             buildingsLayer.clone({
               visible: true,
-              data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.buildingType}'`
+              data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.viewByBuildingType}'`
             })
           );
         } else {
@@ -324,12 +332,14 @@ function Map(props) {
         prevParcelSize !== props.parcelSize ||
         prevSiteCoverage !== props.siteCoverage ||
         prevDelta !== props.delta ||
-        prevZoneType !== props.zoneType) &&
+        prevZoneType !== props.zoneType ||
+        prevBuildingType !== props.buildingType) &&
       (props.address !== "" ||
         props.parcelSize !== "" ||
         props.siteCoverage !== "" ||
         props.delta !== "" ||
-        props.zoneType !== "")
+        props.zoneType !== "" ||
+        props.buildingType !== "")
     ) {
       let query = [];
       if (props.address) {
@@ -347,11 +357,14 @@ function Map(props) {
       if (props.zoneType) {
         query.push(`zone_type = '${props.zoneType}'`);
       }
+      if (props.buildingType) {
+        query.push(`building_type = '${props.buildingType}'`);
+      }
       // console.log("new search, query:", query.join(" AND "));
       deckOverlay.setProps({
         layers: [
           parcelsLayer.clone({
-            data: `select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels WHERE ${query.join(
+            data: `select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels WHERE ${query.join(
               " AND "
             )}`
           }),
@@ -371,19 +384,21 @@ function Map(props) {
         prevParcelSize !== props.parcelSize ||
         prevSiteCoverage !== props.siteCoverage ||
         prevDelta !== props.delta ||
-        prevZoneType !== props.zoneType) &&
+        prevZoneType !== props.zoneType ||
+        prevBuildingType !== props.buildingType) &&
       props.address === "" &&
       props.parcelSize === "" &&
       props.siteCoverage === "" &&
       props.delta === "" &&
-      props.zoneType === ""
+      props.zoneType === "" &&
+      props.buildingType === ""
     ) {
       // console.log("back to default search");
       deckOverlay.setProps({
         layers: [
           parcelsLayer.clone({
             data:
-              "select the_geom_webmercator, area, coverage, delta, address, zone_type from parcels"
+              "select the_geom_webmercator, area, coverage, delta, address, zone_type, building_type from parcels"
           }),
           buildingsLayer.clone({
             visible: props.layers.includes("buildings") === true
@@ -402,16 +417,17 @@ function Map(props) {
     props.parcelSize,
     props.siteCoverage,
     props.delta,
-    props.zoneType
+    props.zoneType,
+    props.buildingType
   ]);
 
   React.useEffect(() => {
     if (!deckOverlay || props.layers.includes("buildings") === false) return;
-    if (props.buildingType !== "") {
+    if (props.viewByBuildingType !== "") {
       deckOverlay.setProps({
         layers: [
           buildingsLayer.clone({
-            data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.buildingType}'`
+            data: `select the_geom_webmercator, bldgtype, address from buildings where bldgtype = '${props.viewByBuildingType}'`
           })
         ]
       });
@@ -425,7 +441,7 @@ function Map(props) {
         ]
       });
     }
-  }, [props.buildingType]);
+  }, [props.viewByBuildingType]);
 
   const onUnmount = React.useCallback(function callback(map) {
     setMap(null);
@@ -524,7 +540,7 @@ function Map(props) {
           >
             <input
               type="text"
-              placeholder="Enter Address"
+              placeholder="Enter address"
               className="autocomplete"
             />
           </Autocomplete>
@@ -533,7 +549,7 @@ function Map(props) {
           <Layers
             dispatch={props.dispatch}
             layers={props.layers}
-            buildingType={props.buildingType}
+            buildingType={props.viewByBuildingType}
             isSidebarVisible={props.isSidebarVisible}
           />
         </MapControl>

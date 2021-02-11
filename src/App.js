@@ -44,12 +44,13 @@ class App extends Component {
             <Map
               dispatch={dispatch}
               layers={map.layers}
-              buildingType={map.buildingType}
+              viewByBuildingType={map.buildingType}
               address={app.address}
               parcelSize={app.parcelSize}
               siteCoverage={app.siteCoverage}
               delta={app.delta}
               zoneType={app.zoneType}
+              buildingType={app.buildingType}
               isGoogleMapsLoading={map.isGoogleMapsLoading}
               isSidebarVisible={app.isSidebarVisible}
               isLoading={app.isLoading}

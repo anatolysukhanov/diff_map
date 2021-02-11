@@ -10,12 +10,14 @@ const appReducer = (state = {}, action) => {
         siteCoverage: action.payload.siteCoverage,
         delta: action.payload.delta,
         zoneType: action.payload.zoneType,
+        buildingType: action.payload.buildingType,
         isLoading:
           action.payload.address !== state.address ||
           action.payload.parcelSize !== state.parcelSize ||
           action.payload.siteCoverage !== state.siteCoverage ||
           action.payload.delta !== state.delta ||
-          action.payload.zoneType !== state.zoneType
+          action.payload.zoneType !== state.zoneType ||
+          action.payload.buildingType !== state.buildingType
       };
 
     case actions.LAYERS_LOADED:
@@ -40,12 +42,14 @@ const appReducer = (state = {}, action) => {
           siteCoverage: "",
           delta: "",
           zoneType: "",
+          buildingType: "",
           isLoading:
             state.address !== "" ||
             state.parcelSize !== "" ||
             state.siteCoverage !== "" ||
             state.delta !== "" ||
-            state.zoneType !== ""
+            state.zoneType !== "" ||
+            state.buildingType !== ""
         };
       } else {
         return {

@@ -1,42 +1,8 @@
 import React, { Component } from "react";
-
-import { toggleLayer, changeBuildingType } from "../actions";
 import { Button, Dropdown } from "semantic-ui-react";
 
-const options = [
-  { text: "AMENITY", value: "AMENITY" },
-  { text: "CARPORT", value: "CARPORT" },
-  { text: "CHURCH", value: "CHURCH" },
-  { text: "COMMERCIAL BUILDING", value: "COMMERCIAL BUILDING" },
-  { text: "COMMUNITY CENTRE", value: "COMMUNITY CENTRE" },
-  { text: "FARM BUILDING", value: "FARM BUILDING" },
-  { text: "FIRE", value: "FIRE" },
-  { text: "GOLF", value: "GOLF" },
-  {
-    text: "GOVERNMENT HERITAGE BUILDING",
-    value: "GOVERNMENT HERITAGE BUILDING"
-  },
-  { text: "INDUSTRIAL BUILDING", value: "INDUSTRIAL BUILDING" },
-  { text: "LIBRARY", value: "LIBRARY" },
-  { text: "MIXED USE", value: "MIXED USE" },
-  { text: "MOSQUE", value: "MOSQUE" },
-  { text: "MULTI FAMILY", value: "MULTI FAMILY" },
-  { text: "MUNICIPAL HALL", value: "MUNICIPAL HALL" },
-  { text: "MUSEUM", value: "MUSEUM" },
-  { text: "OPERATIONS CENTRE", value: "OPERATIONS CENTRE" },
-  { text: "OTHER", value: "OTHER" },
-  { text: "PARK BUILDING", value: "PARK BUILDING" },
-  { text: "POLICE", value: "POLICE" },
-  { text: "RECREATION FACILITY", value: "RECREATION FACILITY" },
-  { text: "RECYCLING BUILDING", value: "RECYCLING BUILDING" },
-  { text: "SCHOOL", value: "SCHOOL" },
-  { text: "SHED", value: "SHED" },
-  { text: "SINGLE FAMILY", value: "SINGLE FAMILY" },
-  { text: "SKI", value: "SKI" },
-  { text: "STABLES", value: "STABLES" },
-  { text: "TRANSPORT BUILDING", value: "TRANSPORT BUILDING" },
-  { text: "UTILITY BUILDING", value: "UTILITY BUILDING" }
-];
+import { toggleLayer, changeBuildingType } from "../actions";
+import { buildingTypes } from "../data";
 
 export default class Layers extends Component {
   /*constructor(props) {
@@ -88,7 +54,7 @@ export default class Layers extends Component {
                 ? "ui dropdown"
                 : "ui disabled dropdown"
             }
-            options={options}
+            options={buildingTypes}
             value={buildingType}
             onChange={this.handleBuildingTypeChange}
           />
