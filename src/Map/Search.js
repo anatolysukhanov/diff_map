@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Input, Label, Button, Icon, Dropdown } from "semantic-ui-react";
+import axios from "axios";
+import { SemanticToastContainer, toast } from "react-semantic-toasts";
 
 import { findParcels, toggleSearchPanel } from "../actions";
 import { buildingTypes } from "../data";
@@ -51,6 +53,57 @@ export default class Search extends Component {
   changeBuildingType = (e, { value }) => this.setState({ buildingType: value });
 
   search = () => {
+    (async () => {
+      try {
+        let query = [];
+        if (this.state.address) {
+          query.push(`address=${this.state.address}`);
+        }
+        if (this.state.parcelSize) {
+          query.push(`area=${this.state.parcelSize}`);
+        }
+        if (this.state.siteCoverage) {
+          query.push(`coverage=${this.state.siteCoverage}`);
+        }
+        if (this.state.delta) {
+          query.push(`delta=${this.state.delta}`);
+        }
+        if (this.state.zoneType) {
+          query.push(`zone_type=${this.state.zoneType}`);
+        }
+        if (this.state.buildingType) {
+          query.push(`building_type=${this.state.buildingType}`);
+        }
+        await axios
+          //.get(`http://localhost/export.php?${query.join("&")}`)
+          .get(`export.php?${query.join("&")}`)
+          .then(response => {
+            const type = response.headers["content-type"];
+            const blob = new Blob([response.data], {
+              type: type,
+              encoding: "UTF-8"
+            });
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `${+new Date()}.csv`;
+            link.click();
+          });
+      } catch (err) {
+        if (err.response.status === 404) {
+          console.log("No results");
+          toast({
+            type: "info",
+            size: "mini",
+            color: "blue",
+            icon: "search",
+            title: "Search",
+            description: "No results",
+            time: 1500
+          });
+        }
+      }
+    })();
+
     this.props.dispatch(
       findParcels({
         address: this.state.address,
@@ -172,6 +225,7 @@ export default class Search extends Component {
         <Button icon size="mini" onClick={this.close}>
           <Icon name="close" />
         </Button>
+        <SemanticToastContainer className="toast-container" />
       </>
     );
   }

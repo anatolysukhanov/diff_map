@@ -231,3 +231,17 @@ body {
   text-overflow: ellipsis;
   margin-right: 10px;
 }
+
+/* toast */
+
+.toast-container {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  width: 150px;
+}
+
+.ui.message > .close.icon {
+  display: none;
+}
