@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
-class LegendControl extends Component {
+class LegendControl extends PureComponent {
   render() {
     const { title, values } = this.props;
     return (

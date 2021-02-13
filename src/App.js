@@ -13,7 +13,6 @@ import { toggleSearchPanel } from "./actions";
 
 class App extends Component {
   hideSidebar = () => {
-    console.log("hideSidebar");
     this.props.dispatch(toggleSearchPanel());
   };
 
@@ -37,7 +36,7 @@ class App extends Component {
           visible={app.isSidebarVisible}
           width="thin"
         >
-          <Search dispatch={dispatch} />
+          <Search dispatch={dispatch} bounds={map.bounds} />
         </Sidebar>
         <Sidebar.Pusher>
           <Segment basic>
@@ -54,6 +53,7 @@ class App extends Component {
               isGoogleMapsLoading={map.isGoogleMapsLoading}
               isSidebarVisible={app.isSidebarVisible}
               isLoading={app.isLoading}
+              bounds={map.bounds}
             />
             {map.tooltip.content !== null && (
               <div

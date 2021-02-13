@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { Button, Dropdown } from "semantic-ui-react";
+import React, { PureComponent } from "react";
+import { Dropdown } from "semantic-ui-react";
 
 import { toggleLayer, changeBuildingType } from "../actions";
 import { buildingTypes } from "../data";
 
-export default class Layers extends Component {
+export default class Layers extends PureComponent {
   /*constructor(props) {
     super(props);
   }*/

@@ -446,6 +446,16 @@ function Map(props) {
     }
   }, [props.viewByBuildingType]);
 
+  React.useEffect(() => {
+    if (!map) return;
+    if (props.bounds) {
+      map.fitBounds(props.bounds);
+    } else {
+      map.setCenter(center);
+      map.setZoom(13);
+    }
+  }, [props.bounds]);
+
   const onUnmount = React.useCallback(function callback(map) {
     setMap(null);
   }, []);
@@ -483,7 +493,6 @@ function Map(props) {
   };
 
   const openSearchPanel = () => {
-    // console.log("open search clicked");
     props.dispatch(toggleSearchPanel());
   };
 

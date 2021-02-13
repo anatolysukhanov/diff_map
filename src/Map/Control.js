@@ -37,4 +37,4 @@ MapControl.propTypes = {
   zIndex: PropTypes.number
 };
 
-export default MapControl;
+export default React.memo(MapControl);

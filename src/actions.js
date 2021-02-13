@@ -7,6 +7,8 @@ export const TOGGLE_LAYER = "TOGGLE_LAYER";
 export const CHANGE_BUILDING_TYPE = "CHANGE_BUILDING_TYPE";
 export const SHOW_TOOLTIP = "SHOW_TOOLTIP";
 
+export const FIT_MAP = "FIT_MAP";
+
 export const findParcels = data => ({
   type: FIND_PARCELS,
   payload: data
@@ -40,4 +42,9 @@ export const changeBuildingType = type => ({
 export const showTooltip = tooltip => ({
   type: SHOW_TOOLTIP,
   payload: tooltip
+});
+
+export const fitMap = data => ({
+  type: FIT_MAP,
+  payload: data
 });

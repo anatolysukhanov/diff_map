@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose, combineReducers } from "redux";
+import { createStore, combineReducers } from "redux";
 // import thunk from "redux-thunk";
 // import { taskMiddleware } from "react-palm/tasks";
 
@@ -24,7 +24,8 @@ const initialState = {
       content: null,
       x: 0,
       y: 0
-    }
+    },
+    bounds: null
   }
 };
 

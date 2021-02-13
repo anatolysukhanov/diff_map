@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 import { Input, Label, Button, Icon, Dropdown } from "semantic-ui-react";
 import axios from "axios";
 import { SemanticToastContainer, toast } from "react-semantic-toasts";
 
-import { findParcels, toggleSearchPanel } from "../actions";
+import { findParcels, fitMap, toggleSearchPanel } from "../actions";
 import { buildingTypes } from "../data";
 
 const zoneTypes = [
@@ -19,7 +19,7 @@ const zoneTypes = [
   { text: "RS", value: "RS" }
 ];
 
-export default class Search extends Component {
+export default class Search extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -31,6 +31,10 @@ export default class Search extends Component {
       buildingType: ""
     };
   }
+
+  /*shouldComponentUpdate = (nextProps, nextState) => {
+    return this.props.bounds !== nextProps.bounds;
+  };*/
 
   changeAddress = event => {
     this.setState({ address: event.target.value });
@@ -54,6 +58,61 @@ export default class Search extends Component {
 
   search = () => {
     (async () => {
+      let query = [];
+      if (this.state.address) {
+        query.push(`address=${this.state.address}`);
+      }
+      if (this.state.parcelSize) {
+        query.push(`area=${this.state.parcelSize}`);
+      }
+      if (this.state.siteCoverage) {
+        query.push(`coverage=${this.state.siteCoverage}`);
+      }
+      if (this.state.delta) {
+        query.push(`delta=${this.state.delta}`);
+      }
+      if (this.state.zoneType) {
+        query.push(`zone_type=${this.state.zoneType}`);
+      }
+      if (this.state.buildingType) {
+        query.push(`building_type=${this.state.buildingType}`);
+      }
+      await axios
+        .get(`http://localhost/search.php?${query.join("&")}`)
+        //.get(`search.php?${query.join("&")}`)
+        .then(response => {
+          if (response.data === false) {
+            toast({
+              type: "info",
+              size: "mini",
+              color: "blue",
+              icon: "search",
+              title: "Search",
+              description: "No results",
+              time: 1500
+            });
+            this.props.dispatch(fitMap(null));
+          } else {
+            // console.log("response", response.data);
+            this.props.dispatch(fitMap(response.data));
+          }
+        });
+    })();
+
+    this.props.dispatch(
+      findParcels({
+        address: this.state.address,
+        parcelSize: this.state.parcelSize,
+        siteCoverage: this.state.siteCoverage,
+        delta: this.state.delta,
+        zoneType: this.state.zoneType,
+        buildingType: this.state.buildingType
+      })
+    );
+  };
+
+  export = () => {
+    (async () => {
       try {
         let query = [];
         if (this.state.address) {
@@ -75,8 +134,8 @@ export default class Search extends Component {
           query.push(`building_type=${this.state.buildingType}`);
         }
         await axios
-          //.get(`http://localhost/export.php?${query.join("&")}`)
-          .get(`export.php?${query.join("&")}`)
+          .get(`http://localhost/export.php?${query.join("&")}`)
+          //.get(`export.php?${query.join("&")}`)
           .then(response => {
             const type = response.headers["content-type"];
             const blob = new Blob([response.data], {
@@ -90,30 +149,9 @@ export default class Search extends Component {
           });
       } catch (err) {
         if (err.response.status === 404) {
-          console.log("No results");
-          toast({
-            type: "info",
-            size: "mini",
-            color: "blue",
-            icon: "search",
-            title: "Search",
-            description: "No results",
-            time: 1500
-          });
         }
       }
     })();
-
-    this.props.dispatch(
-      findParcels({
-        address: this.state.address,
-        parcelSize: this.state.parcelSize,
-        siteCoverage: this.state.siteCoverage,
-        delta: this.state.delta,
-        zoneType: this.state.zoneType,
-        buildingType: this.state.buildingType
-      })
-    );
   };
 
   close = () => {
@@ -137,6 +175,7 @@ export default class Search extends Component {
       zoneType,
       buildingType
     } = this.state;
+    const { bounds } = this.props;
     return (
       <>
         <div className="ui form mini">
@@ -220,6 +259,10 @@ export default class Search extends Component {
             onClick={this.search}
           >
             Search
+          </Button>
+          &nbsp;
+          <Button disabled={!bounds} onClick={this.export}>
+            Export
           </Button>
         </div>
         <Button icon size="mini" onClick={this.close}>
